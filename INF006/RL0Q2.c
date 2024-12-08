@@ -20,6 +20,10 @@ typedef struct Point {
     int pontoX, pontoY;
 } Point;
 
+typedef struct PointFloat {
+    float pontoXf, pontoYf;
+} PointFloat;
+
 typedef struct Inteiro {
     int iNumero;
 } Inteiro;
@@ -63,27 +67,23 @@ int verificarDado(char buffer[], String listaString[], String listaStringOrdenad
         listaFloatOrdenada[*quantidadeFloat].fNumero = atof(buffer);
         *quantidadeFloat = *quantidadeFloat + 1;
         return pontoFlutuante;
-    }
+    } else {
 
-    /* Verificar se o número é inteiro */
-    bool isInteiro = true;
-    for (int icont = 0; icont < strlen(buffer); icont = icont + 1){
-        if (isdigit(buffer[icont]) == false){
-            isInteiro = false;
-            break;
+        /* Verificar se o dado é um inteiro */
+        for (int icont = 0; icont < strlen(buffer); icont = icont + 1){
+            if (isdigit(buffer[icont])){
+                listaInt[*quantidadeInt].iNumero = atoi(buffer);
+                listaIntOrdenada[*quantidadeInt].iNumero = atoi(buffer);
+                *quantidadeInt = *quantidadeInt + 1;
+                return inteiro;
+            }
         }
-    }
-
-    if (isInteiro == true){
-        listaInt[*quantidadeInt].iNumero = atoi(buffer);
-        listaIntOrdenada[*quantidadeInt].iNumero = atoi(buffer);
-        *quantidadeInt = *quantidadeInt + 1;
-        return inteiro;
     }
 } 
 
 int main (){
     Point listaPonto[tamanho], listaOrdenada[tamanho];
+    PointFloat flistaPonto[tamanho], flistaOrdenada[tamanho];
     Inteiro listaInt[tamanho], listaIntOrdenada[tamanho];
     Float listaFloat[tamanho], listaFloatOrdenada[tamanho];
     String listaString[tamanho], listaStringOrdenada[tamanho];
@@ -91,7 +91,7 @@ int main (){
     int retorno;
     char buffer[maximo];
 
-    int quantidadeInt = 0, quantidadeFloat = 0, quantidadePontos = 0, quantidadeChar = 0;
+    int quantidadeInt = 0, quantidadeFloat = 0, quantidadePontos = 0, quantidadeChar = 0, fquantidadePontos = 0;
 
     FILE *fp_in = fopen("L0Q2.in", "r");
     FILE *fp_out = fopen("L0Q2.out", "w");
@@ -103,21 +103,28 @@ int main (){
 
     char line[maximo]; /* Capacitade de caractere máximo da linha */
     while (fgets(line, sizeof(line), fp_in)){
-        quantidadeInt = quantidadeFloat = quantidadePontos = quantidadeChar = 0;
-
+        quantidadeInt = quantidadeFloat = quantidadePontos = quantidadeChar = 0, fquantidadePontos = 0; /* Reiniciar a contagem para cada linha */
+        
         /* Ler cada dados do arquivo de entrada */
         char *slice = strtok(line, " "); /* Separador padrão de cada dado */
 
         while (slice != NULL){
-            int x, y;
-            if(sscanf(slice, "(%d,%d)", &x, &y) == 2){
+            int iX, iY;
+            float fX, fY;
+            if (sscanf(slice, " (%d,%d)", &iX, &iY) == 2){
                 if(quantidadePontos < tamanho){
-                    listaPonto[quantidadePontos].pontoX = x;
-                    listaPonto[quantidadePontos].pontoY = y;
+                    listaPonto[quantidadePontos].pontoX = iX;
+                    listaPonto[quantidadePontos].pontoY = iY;
                     listaOrdenada[quantidadePontos] = listaPonto[quantidadePontos]; /* Cópia para ordenar a lista de pontos na função */
                     quantidadePontos = quantidadePontos + 1;
                 }
-            
+            } else if (sscanf(slice, " (%f,%f)", &fX, &fY) == 2) {
+                if(fquantidadePontos < tamanho){
+                    flistaPonto[fquantidadePontos].pontoXf = fX;
+                    flistaPonto[fquantidadePontos].pontoYf = fY;
+                    flistaOrdenada[fquantidadePontos] = flistaPonto[fquantidadePontos]; /* Cópia para ordenar a lista de pontos na função */
+                    fquantidadePontos = fquantidadePontos + 1;
+                }
             } else {
                 retorno = verificarDado(slice, listaString, listaStringOrdenada, listaFloat, listaFloatOrdenada, listaInt, listaIntOrdenada, &quantidadeChar, &quantidadeFloat, &quantidadeInt);
             }
@@ -131,6 +138,17 @@ int main (){
                     Point aux = listaOrdenada[jcont];
                     listaOrdenada[jcont] = listaOrdenada[jcont + 1];
                     listaOrdenada[jcont + 1] = aux;
+                }
+            }
+        }
+
+        /* Ordenação dos ponto (float) usando bubble sort */
+        for (int icont = 0; icont < fquantidadePontos - 1; icont = icont + 1){
+            for (int jcont = 0; jcont < fquantidadePontos - icont - 1; jcont = jcont + 1){
+                if (flistaOrdenada[jcont].pontoXf > flistaOrdenada[jcont + 1].pontoXf){
+                    PointFloat aux = flistaOrdenada[jcont];
+                    flistaOrdenada[jcont] = flistaOrdenada[jcont + 1];
+                    flistaOrdenada[jcont + 1] = aux;
                 }
             }
         }
@@ -194,11 +212,18 @@ int main (){
         }
         fprintf(fp_out, " float:");
         for (int icont = 0; icont < quantidadeFloat; icont = icont + 1){
-            fprintf(fp_out, " %.1f", listaFloatOrdenada[icont].fNumero);
+            fprintf(fp_out, " %.2f", listaFloatOrdenada[icont].fNumero);
         }
         fprintf(fp_out, " p:");
-        for (int icont = 0; icont < quantidadePontos; icont = icont + 1){
-            fprintf(fp_out, " (%d,%d)", listaOrdenada[icont].pontoX, listaOrdenada[icont].pontoY);
+        if (fquantidadePontos > 0) { // Se houver pontos flutuantes
+            for (int icont = 0; icont < fquantidadePontos; icont = icont + 1) {
+                fprintf(fp_out, " (%.2f,%.2f)", flistaOrdenada[icont].pontoXf, flistaOrdenada[icont].pontoYf);
+            }
+        }
+        if (quantidadePontos > 0) { // Se houver pontos inteiros
+            for (int icont = 0; icont < quantidadePontos; icont = icont + 1) {
+                fprintf(fp_out, " (%d,%d)", listaOrdenada[icont].pontoX, listaOrdenada[icont].pontoY);
+            }
         }
         fprintf(fp_out, "\n");
     }
