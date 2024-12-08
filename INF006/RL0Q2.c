@@ -131,10 +131,12 @@ int main (){
             slice = strtok(NULL, " ");
         }
         
-        /* Ordenação dos ponto usando bubble sort */
-        for (int icont = 0; icont < quantidadePontos - 1; icont = icont + 1){
-            for (int jcont = 0; jcont < quantidadePontos - icont - 1; jcont = jcont + 1){
-                if (listaOrdenada[jcont].pontoX > listaOrdenada[jcont + 1].pontoX){
+        /* Ordenação dos pontos inteiros */
+        for (int icont = 0; icont < quantidadePontos - 1; icont++) {
+            for (int jcont = 0; jcont < quantidadePontos - icont - 1; jcont++) {
+                if (listaOrdenada[jcont].pontoX > listaOrdenada[jcont + 1].pontoX ||
+                    (listaOrdenada[jcont].pontoX == listaOrdenada[jcont + 1].pontoX &&
+                     listaOrdenada[jcont].pontoY > listaOrdenada[jcont + 1].pontoY)) {
                     Point aux = listaOrdenada[jcont];
                     listaOrdenada[jcont] = listaOrdenada[jcont + 1];
                     listaOrdenada[jcont + 1] = aux;
@@ -142,10 +144,12 @@ int main (){
             }
         }
 
-        /* Ordenação dos ponto (float) usando bubble sort */
-        for (int icont = 0; icont < fquantidadePontos - 1; icont = icont + 1){
-            for (int jcont = 0; jcont < fquantidadePontos - icont - 1; jcont = jcont + 1){
-                if (flistaOrdenada[jcont].pontoXf > flistaOrdenada[jcont + 1].pontoXf){
+       /* Ordenação dos pontos flutuantes */
+        for (int icont = 0; icont < fquantidadePontos - 1; icont++) {
+            for (int jcont = 0; jcont < fquantidadePontos - icont - 1; jcont++) {
+                if (flistaOrdenada[jcont].pontoXf > flistaOrdenada[jcont + 1].pontoXf ||
+                    (flistaOrdenada[jcont].pontoXf == flistaOrdenada[jcont + 1].pontoXf &&
+                     flistaOrdenada[jcont].pontoYf > flistaOrdenada[jcont + 1].pontoYf)) {
                     PointFloat aux = flistaOrdenada[jcont];
                     flistaOrdenada[jcont] = flistaOrdenada[jcont + 1];
                     flistaOrdenada[jcont + 1] = aux;
