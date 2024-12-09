@@ -1,3 +1,10 @@
+/*
+    ----- Dados do Aluno -----
+    Nome: Pedro Vitor Aquino Ferreira
+    email: pedro.aquino.ct@gmail.com
+    Matrícula: 20222160022
+    Semestre: 2024/2
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,6 +39,8 @@ typedef struct Float {
     float fNumero;
 } Float;
 
+void limparString(char *str);
+
 int verificarDado(char buffer[], String listaString[], String listaStringOrdenada[], Float listaFloat[], Float listaFloatOrdenada[], Inteiro listaInt[], Inteiro listaIntOrdenada[], int *quantidadeChar, int *quantidadeFloat, int *quantidadeInt){
     /* Verificar se o dado é uma palavra */
     bool isPalavra = false;
@@ -43,32 +52,35 @@ int verificarDado(char buffer[], String listaString[], String listaStringOrdenad
     }
 
     if (isPalavra == true){
+        limparString(buffer);
         strcpy(listaString[*quantidadeChar].string, buffer);
         strcpy(listaStringOrdenada[*quantidadeChar].string, buffer);
         *quantidadeChar = *quantidadeChar + 1;
         return palavra;
     }
 
-    /* Verificar se o dado é um ponto flutuante */
+   /* Verificar se o dado é um ponto flutuante */
     bool isFloat = false;
     int pontoCount = 0;
     for (int icont = 0; icont < strlen(buffer); icont = icont + 1){
         if (buffer[icont] == '.'){
             pontoCount = pontoCount + 1;
+            break;
         }
-
-        if (isdigit(buffer[icont]) || buffer[icont] == '.'){
-            isFloat = true;
-        } else { isFloat = false; break; }
+    }
+    
+    if (pontoCount == 1){
+        isFloat = true;
+    } else if (pontoCount == 0) { 
+        isFloat = false; 
     }
 
-    if (isFloat == true && pontoCount == 1){
+    if (isFloat == true){
         listaFloat[*quantidadeFloat].fNumero = atof(buffer);
         listaFloatOrdenada[*quantidadeFloat].fNumero = atof(buffer);
         *quantidadeFloat = *quantidadeFloat + 1;
         return pontoFlutuante;
-    } else {
-
+    } else if(isFloat == false) {
         /* Verificar se o dado é um inteiro */
         for (int icont = 0; icont < strlen(buffer); icont = icont + 1){
             if (isdigit(buffer[icont])){
@@ -78,6 +90,13 @@ int verificarDado(char buffer[], String listaString[], String listaStringOrdenad
                 return inteiro;
             }
         }
+    }
+} 
+
+void limparString(char *str) {
+    char *p = strchr(str, '\n'); /* Procura o caractere '\n' */
+    if (p) {
+        *p = '\0';  /* Substitui '\n' por '\0' */
     }
 } 
 
